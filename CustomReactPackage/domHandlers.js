@@ -1,5 +1,6 @@
 import { getAttributeNameFromProp } from "./utils/index.js";
 import { EVENT_HANDLERS_MAP } from "./constants/index.js";
+import { addElementToRerenderMap, onRenderEnd, onRenderStart } from "./hooks.js";
 
 const applyPropsToHtmlElement = (element, props) => {
   Object.entries(props).forEach(([key, value]) => {
@@ -34,7 +35,7 @@ const createHtmlFromTagElement = (element) => {
   return htmlElement;
 };
 
-const createHtmlFromFunctionalComponent = (element) => {
+export const createHtmlFromFunctionalComponent = (element) => {
   const { type, props } = element;
   const FunctionalComponent = type;
   const childElement = FunctionalComponent(props);
@@ -42,7 +43,7 @@ const createHtmlFromFunctionalComponent = (element) => {
 };
 
 const createHTMLElement = (element) => {
-  const { props, type } = element;
+  const { props, type } = element || {};
   let children = props?.children;
   let htmlElement = null;
   if (typeof element === "object") {
@@ -69,8 +70,16 @@ const createHTMLElement = (element) => {
 };
 
 const renderAndAppendElement = (parent, element) => {
+  const { props, type } = element || {};
+  if (typeof type === "function") {
+    const { cKey } = props;
+    onRenderStart(cKey);
+  }
   const htmlElement = createHTMLElement(element);
-  parent.appendChild(htmlElement);
+  const domElement = parent.appendChild(htmlElement);
+  if (typeof type === "function") {
+    onRenderEnd(domElement, element);
+  }
 };
 
 const createRoot = (rootElement) => ({
