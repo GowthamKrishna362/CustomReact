@@ -7,9 +7,7 @@ const rootElement = document.getElementById("root");
 const root = DOMHandlers.createRoot(rootElement);
 const HiComponent2 = () => {
   const [state, setState] = useState(2);
-  const [state2, setState2] = useState(3);
-  console.log(state, state2, "xyz9");
-  
+  const [state2, setState2] = useState(3);  
 
   if (state === 2) {
     setTimeout(() => {
